@@ -22,16 +22,22 @@ class _AuthButtonState extends State<AuthButton> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    super.initState();
     _animationController =
         AnimationController(vsync: this, duration: widget.duration);
     Future.delayed(Duration(milliseconds: 200), () {
       _animationController!.forward();
     });
-    _animation = Tween<Offset>(
+   
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+     _animation = Tween<Offset>(
             begin: Offset(MediaQuery.of(context).size.width, 0.0),
             end: Offset(0.0, 0.0))
         .animate(_animationController!);
-    super.initState();
   }
 
   @override

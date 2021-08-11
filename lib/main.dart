@@ -1,5 +1,6 @@
 import 'package:eighty_two/authentication/providers/auth_provider.dart';
 import 'package:eighty_two/authentication/repositories/firebase_auth_repository.dart';
+import 'package:eighty_two/authentication/screens/screens.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class EightyTwoApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           fontFamily: "IBM Plex Sans",
         ),
-        home: Scaffold(),
+        home: SignUpScreen(),
       ),
     );
   }
