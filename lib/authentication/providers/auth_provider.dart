@@ -8,7 +8,7 @@ enum AuthFailure {
   none,
   emailInUse,
   invalidPassword,
-  unknown,
+  unknownFailure,
 }
 
 class AuthProvider extends ChangeNotifier {
@@ -19,11 +19,15 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
+  final AuthRepository repository;
+  late StreamSubscription<User?> _userStream;
+
   bool isLoading = false;
   bool hasError = false;
   String? errorMessage;
-  late StreamSubscription<User?> _userStream;
-  final AuthRepository repository;
+
+  AuthFailure _authFailure = AuthFailure.none;
+  AuthFailure get authFailure => _authFailure;
 
   User? user;
 
@@ -39,13 +43,28 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signUpWithEmailAndPassword({
+  Future<void> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     _onActionStart();
     try {
       await repository.loginWithEmailAndPassword(email, password);
+    } catch (exception) {
+      errorMessage = exception.toString();
+      hasError = true;
+    } finally {
+      _onActionEnd();
+    }
+  }
+
+  Future<void> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    _onActionStart();
+    try {
+      await repository.signUp(email, password);
     } catch (exception) {
       errorMessage = exception.toString();
       hasError = true;
