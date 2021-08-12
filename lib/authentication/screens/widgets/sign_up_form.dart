@@ -1,4 +1,6 @@
+import 'package:eighty_two/authentication/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'auth_button.dart';
 import 'auth_text_field.dart';
@@ -21,10 +23,56 @@ class _SignUpFormState extends State<SignUpForm> {
 
   String? passwordError;
 
-  _fieldFocusChange(
+  void _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
+  }
+
+  void _onSignUpButtonPressed(BuildContext context) async {
+    final email = _emailController.text.toLowerCase().trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (email.isEmpty) {
+      showAlert(message: 'Please enter your email', context: context);
+      return;
+    }
+
+    bool isEmailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+
+    if (!isEmailValid) {
+      showAlert(
+        message: 'Please enter a valid email',
+        context: context,
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      showAlert(
+        message: 'Please enter your password',
+        context: context,
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      showAlert(
+        message: 'Make sure your password and the confirm password match',
+        context: context,
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    authProvider.signUpWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -76,7 +124,7 @@ class _SignUpFormState extends State<SignUpForm> {
             obscureText: true,
             textCapitalization: TextCapitalization.none,
             keyboardType: TextInputType.text,
-            textEditingController: TextEditingController(),
+            textEditingController: _confirmPasswordController,
             textInputAction: TextInputAction.done,
             focusNode: _confirmPasswordNode,
           ),
@@ -84,21 +132,25 @@ class _SignUpFormState extends State<SignUpForm> {
           AuthButton(
             duration: const Duration(milliseconds: 600),
             text: 'Sign Up',
-            onPress: () {
-              if (_passwordController.text.trim().isEmpty) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (_) => AlertDialog(
-                    content: Text('Enter your password!'),
-                  ),
-                );
-              }
-              if (_passwordController.text !=
-                  _confirmPasswordController.text) {}
-            },
+            onPress: () => _onSignUpButtonPressed(context),
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Future<void> showAlert(
+      {required String message, required BuildContext context}) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Ok'),
+          ),
         ],
       ),
     );
