@@ -10,6 +10,16 @@ class FirebaseAuthRepository implements AuthRepository {
     try {
       _auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
+      if (e is FirebaseException) {
+        switch (e.code) {
+          case 'user-not-found':
+            throw EmailDoesNotExistException();
+          case 'wrong-password':
+            throw WrongPasswordException();
+          default:
+            throw e;
+        }
+      }
       throw e;
     }
   }
@@ -18,7 +28,20 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> signUp(String email, String password) async {
     try {
       _auth.createUserWithEmailAndPassword(email: email, password: password);
-    } catch (e) {
+    } on FirebaseException {} catch (e) {
+      if (e is FirebaseException) {
+        switch (e.code) {
+          case 'email-already-in-use':
+            throw EmailAlreadyInUseException();
+          case 'invalid-email':
+            throw InvalidEmailException();
+          case 'weak-password':
+            throw WeakPasswordException();
+          default:
+            throw e;
+        }
+      }
+
       throw e;
     }
   }

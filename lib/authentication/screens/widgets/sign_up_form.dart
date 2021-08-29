@@ -23,10 +23,58 @@ class _SignUpFormState extends State<SignUpForm> {
 
   String? passwordError;
 
-  _fieldFocusChange(
+  void _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
+  }
+
+  void showAlert({required String message, required BuildContext context}) {}
+
+  void _onSignUpButtonPressed(BuildContext context) async {
+    final email = _emailController.text.toLowerCase().trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (email.isEmpty) {
+      showAlert(message: 'Please enter your email', context: context);
+      return;
+    }
+
+    bool isEmailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+
+    if (!isEmailValid) {
+      showAlert(
+        message: 'Please enter a valid email',
+        context: context,
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      showAlert(
+        message: 'Please enter your password',
+        context: context,
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      showAlert(
+        message: 'Make sure your password and the confirm password match',
+        context: context,
+      );
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+
+    authProvider.signUpWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -102,8 +150,8 @@ class _SignUpFormState extends State<SignUpForm> {
                   context: context,
                   barrierDismissible: true,
                   builder: (_) => AlertDialog(
-                    content:
-                        const Text('Ensure your password and confirm password match'),
+                    content: const Text(
+                        'Ensure your password and confirm password match'),
                   ),
                 );
                 return;
@@ -114,7 +162,6 @@ class _SignUpFormState extends State<SignUpForm> {
                   );
             },
           ),
-          const SizedBox(height: 50),
         ],
       ),
     );

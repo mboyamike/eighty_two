@@ -6,3 +6,9 @@ abstract class AuthRepository {
   Stream<User?> getUser();
   Future<void> logOut();
 }
+
+class EmailAlreadyInUseException implements Exception {}
+class EmailDoesNotExistException implements Exception {}
+class InvalidEmailException implements Exception {}
+class WeakPasswordException implements Exception {}
+class WrongPasswordException implements Exception {}
