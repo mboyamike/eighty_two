@@ -1,4 +1,6 @@
+import 'package:eighty_two/authentication/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'auth_button.dart';
 import 'auth_text_field.dart';
@@ -76,7 +78,7 @@ class _SignUpFormState extends State<SignUpForm> {
             obscureText: true,
             textCapitalization: TextCapitalization.none,
             keyboardType: TextInputType.text,
-            textEditingController: TextEditingController(),
+            textEditingController: _confirmPasswordController,
             textInputAction: TextInputAction.done,
             focusNode: _confirmPasswordNode,
           ),
@@ -90,12 +92,26 @@ class _SignUpFormState extends State<SignUpForm> {
                   context: context,
                   barrierDismissible: true,
                   builder: (_) => AlertDialog(
-                    content: Text('Enter your password!'),
+                    content: const Text('Enter your password!'),
                   ),
                 );
+                return;
               }
-              if (_passwordController.text !=
-                  _confirmPasswordController.text) {}
+              if (_passwordController.text != _confirmPasswordController.text) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (_) => AlertDialog(
+                    content:
+                        const Text('Ensure your password and confirm password match'),
+                  ),
+                );
+                return;
+              }
+              context.read<AuthProvider>().signUpWithEmailAndPassword(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                  );
             },
           ),
           const SizedBox(height: 50),

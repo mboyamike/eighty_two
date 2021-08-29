@@ -45,10 +45,23 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     _onActionStart();
     try {
-      await repository.loginWithEmailAndPassword(email, password);
+      await repository.signUp(email, password);
     } catch (exception) {
       errorMessage = exception.toString();
       hasError = true;
+    } finally {
+      _onActionEnd();
+    }
+  }
+
+  void signOut() async {
+    _onActionStart();
+
+    try {
+      await repository.logOut();
+    } catch (e) {
+      hasError = true;
+      errorMessage = e.toString();
     } finally {
       _onActionEnd();
     }

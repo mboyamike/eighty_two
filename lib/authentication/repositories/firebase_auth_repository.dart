@@ -37,4 +37,9 @@ class FirebaseAuthRepository implements AuthRepository {
                 ),
         );
   }
+
+  @override
+  Future<void> logOut() {
+    return _auth.signOut();
+  }
 }
